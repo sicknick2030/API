@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+    <title>Giphy API</title>
+    <style type="text/css">
+      button, div, form, input {
+        margin: 10px;
+      }
+    </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>NBA Search</h1>
+
+    <div id="buttons-view"></div>
+    <form id="gif-form">
+      <label for="gif-input">Add an NBA Team</label>
+      <input type="text" id="team-input"><br>
+      <input id="add-team" type="submit" value="submit">
+    </form>
+    <div id="gif-view"></div>
+  </div>
+    
+  <script type="text/javascript">
+      
+  var topics = ["Mavericks", "Lakers", "Nets", "Thunder"];
+
+      
+  function displayTeamGifs() {
+
+  }
+
+  function renderButtons() {
+
+    $("#buttons-view").empty();
+
+    for (var i = 0; i < topics.length; i++) {
+
+          
+      var teamButton = $("<button>");
+      console.log(teamButton)
+      
+      teamButton.addClass("tButton");
+      
+      teamButton.attr("data-name", topics[i]);
+      
+      teamButton.text(topics[i]);
+      
+      $("#buttons-view").append(teamButton);
+    }
+  }
+
+  renderButtons();
+  $(document).ready(function(){
+
+    $("#add-team").on("click", function(event) {
+      event.preventDefault();
+      
+      var team = $("#team-input").val().trim();
+
+      
+      topics.push(team);
+
+      
+      renderButtons();
+    });
+
+        
+    $("#buttons-view").on("click", ".tButton", function() {
+
+      $("#gif-view").empty();
+      
+      var team = $(this).attr("data-name");
+      console.log($(this))
+      var queryURL = "https://api.giphy.com/v1/gifs/search?=&api_key=zsOQuRCllJAffjPMgLb6ZMjTE03eIGNr&q=" + team + "&limit=10"
+
+      $.ajax({
+      url: queryURL,
+      method: "GET"
+      }).done(function(response) {
+
+      console.log(response);
+      console.log(queryURL);
+      
+        for (var j = 0; j < response.data.length; j++) {
+          
+          console.log("inside for loop")
+          var gifDiv = $("<div class='gif'>");
+
+          
+          var rating = response.data[j].rating;
+          console.log(rating)
+
+          
+          var ratingDiv = $("<p>").text("Rating: " + rating);
+
+          gifDiv.append(ratingDiv);
+
+
+
+          
+          var teamImage = $("<img>");
+
+          teamImage.attr("src", response.data[j].images.fixed_height.url);
+          teamImage.attr("data-still", response.data[j].images.fixed_height_still.url);
+          teamImage.attr("data-animate", response.data[j].images.fixed_height.url);
+
+          console.log(teamImage)
+
+           
+          gifDiv.append(teamImage);
+
+          $("#gif-view").append(gifDiv)
+        }
+        
+        $(".gif").on("click", "img", function() {
+          console.log("imgclicked");
+
+          var state = $(this).attr("data-state");
+          
+          if (state === "still") {
+            $(this).attr("src", $(this).attr("data-animate"));
+            $(this).attr("data-state", "animate");
+          } else {
+            $(this).attr("src",  $(this).attr("data-still"));
+            $(this).attr("data-state", "still");
+          }
+        })
+      });
+    });
+  });        
+</script>
+</body>
+</html>
